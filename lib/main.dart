@@ -57,13 +57,31 @@ class _MyHomePageState extends State<MyHomePage> {
           onPressed: () {
             //dataModel.createDataModel();
             print("Event");
-            firebasehelper.addRecord("aa", "aa");
+            //firebasehelper.addRecord("aa", "aa");
+            //firebasehelper.reduceExpense();
+            printNameTransaction();
           },
           child: /*eventlistscr()*/ Text("Create data model"),
         ),
       ),
       body: Text("Hello"),
     );
+  }
+
+  void printNameTransaction() async {
+    String qUser = "A";
+    DocumentSnapshot<Map<String, dynamic>> d = await FirebaseFirestore.instance
+        .collection("events")
+        .doc("Moscow Trip")
+        .collection("userData")
+        .doc(qUser)
+        .get();
+    Map<String, dynamic> m = d.data() as Map<String, dynamic>;
+    print(qUser + " data:");
+    for (String val in m.keys) {
+      print(qUser + " will give " + m[val][0].toString() + " to " + val);
+      print(qUser + " will take " + m[val][1].toString() + " from " + val);
+    }
   }
 
   Future<void> sett() async {

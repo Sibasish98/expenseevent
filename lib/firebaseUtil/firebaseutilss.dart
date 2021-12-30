@@ -55,7 +55,10 @@ class firebasehelper {
         .get();
     //loop for paid by user Data edit
     for (String n in paid_for) {
-      if (paid_by == n) continue;
+      if (paid_by == n) {
+        print(paid_by + " " + n);
+        continue;
+      }
       //get the old array data
       double toTake = 0;
       try {
@@ -80,7 +83,7 @@ class firebasehelper {
             .collection("userData")
             .doc(paid_by)
             .update({
-          n: [amount_due, 0],
+          n: [0, amount_due],
         });
         toTake = 0;
       }
@@ -125,6 +128,51 @@ class firebasehelper {
         toTake = 0;
       }
     }
+  }
+
+  static void reduceExpense() async {
+    String paid_by = "B";
+    String paid_to = "A";
+    int amount = 5;
+    String event = "Moscow Trip";
+    DocumentSnapshot<Map<String, dynamic>> ref = await FirebaseFirestore
+        .instance
+        .collection("events")
+        .doc(event)
+        .collection("userData")
+        .doc(paid_by)
+        .get();
+    int am = ref.data()![paid_to][0];
+    int r = ref.data()![paid_to][1];
+    am -= amount;
+    //set new values ofr paid by
+    FirebaseFirestore.instance
+      ..collection("events")
+          .doc(event)
+          .collection("userData")
+          .doc(paid_by)
+          .update({
+        paid_to: [am, r]
+      });
+    //====now for paid to
+    ref = await FirebaseFirestore.instance
+        .collection("events")
+        .doc(event)
+        .collection("userData")
+        .doc(paid_to)
+        .get();
+    am = ref.data()![paid_by][1];
+    r = ref.data()![paid_by][0];
+    am -= amount;
+    //set new values ofr paid by
+    FirebaseFirestore.instance
+      ..collection("events")
+          .doc(event)
+          .collection("userData")
+          .doc(paid_to)
+          .update({
+        paid_by: [r, am]
+      });
   }
 
   static void deleteRecord(String name, String path) {
